@@ -10,10 +10,6 @@ class Cat:
         SALAMI = 'salami'
         DOG = 'dog'
 
-        @classmethod
-        def has_value(cls, value):
-            return value in cls._value2member_map_
-
     @property
     def state(self):
         return self._state
