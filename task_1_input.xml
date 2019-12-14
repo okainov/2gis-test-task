@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<people>
+<person>
+<start>21-12-2018 10:54:47</start>
+<end>21-12-2018 19:43:02</end>
+</person>
+<person full_name="a.stepanova">
+<start>21-12-2018 09:40:10</start>
+<end>21-12-2018 17:59:15</end>
+</person>
+<person full_name="a.stepanovic">
+<start>21-12-2018 09:40:10</start>
+<end>22-12-2018 09:40:10</end>
+</person>
+<person full_name="a.stepanovic">
+<start>23-12-2018 09:40:10</start>
+<end>23-12-2018 09:40:11</end>
+</person>
+</people>
