@@ -1,65 +1,105 @@
 from enum import Enum
+from typing import List
 
 
 class InvalidInputException(Exception):
     pass
 
 
-class Cat:
-    class CatInput(Enum):
-        SALAMI = 'salami'
-        DOG = 'dog'
+class InvalidCatConfigurationException(Exception):
+    pass
 
+
+class CatState(Enum):
+    HUNGRY = 1
+    FULL = 2
+
+
+class CatTransition:
+    """
+    Description of a single Finite Automata transition. If Cat is in the `state` and the input given is `input_symbol`
+    then Cat will move to `new_state` executing `side_effect`.
+    If `new_state` is None, no state will be changed.
+    """
+
+    def __init__(self, state: CatState, input_symbol: str, new_state: CatState = None, side_effect: callable = None):
+        self.state = state
+        self.input = input_symbol
+        self.new_state = new_state
+        self.side_effect = side_effect
+
+
+def side_effect_run():
+    """
+    Default side effect, called when cat is running
+    """
+    print('Run')
+
+
+def side_effect_eat():
+    """
+    Default side effect, called when cat is eating
+    """
+    print('Eat')
+
+
+def side_effect_sleep():
+    """
+    Default side effect, called when cat is sleeping
+    """
+    print('Sleep')
+
+
+class Cat:
     @property
     def state(self):
         return self._state
 
-    class CatState(Enum):
-        HUNGRY = 1
-        FULL = 2
+    def __init__(self, states: List[CatState] = None, initial_state: CatState = CatState.HUNGRY,
+                 transitions: List[CatTransition] = None):
 
-        def handle(self, input_symbol: str, cat: 'Cat') -> 'Cat.CatState':
-            """
-            Handles the transition from the given state according to the `input_symbol`. Some side effects
-            can be applied for cat objects according to the rules of transition.
-            Throws InvalidInputException if input does not correspond to acceptable valid inputs
-            :param input_symbol: input string
-            :param cat: Cat object
-            :return: new CatState
-            """
-            try:
-                input_object = Cat.CatInput(input_symbol)
-            except ValueError:
-                raise InvalidInputException
+        if states is None:
+            self.states = [CatState.FULL, CatState.HUNGRY]
+        else:
+            self.states = states
+        if initial_state is None:
+            self._state = CatState.HUNGRY
+        else:
+            if initial_state not in self.states:
+                raise InvalidCatConfigurationException('Initial state is not present in available states')
+            self._state = initial_state
 
-            new_state = self
-            if self == Cat.CatState.HUNGRY and input_object == Cat.CatInput.DOG:
-                cat.action_run()
-            elif self == Cat.CatState.HUNGRY and input_object == Cat.CatInput.SALAMI:
-                cat.action_eat()
-                new_state = Cat.CatState.FULL
-            elif self == Cat.CatState.FULL and input_object == Cat.CatInput.SALAMI:
-                cat.action_sleep()
-                new_state = Cat.CatState.HUNGRY
-            elif self == Cat.CatState.FULL and input_object == Cat.CatInput.DOG:
-                cat.action_run()
-                new_state = Cat.CatState.HUNGRY
-            return new_state
+        if transitions is None:
+            self.transitions = [
+                CatTransition(state=CatState.HUNGRY, input_symbol='dog', side_effect=side_effect_run),
+                CatTransition(state=CatState.HUNGRY, input_symbol='salami', new_state=CatState.FULL,
+                              side_effect=side_effect_eat),
+                CatTransition(state=CatState.FULL, input_symbol='dog', new_state=CatState.HUNGRY,
+                              side_effect=side_effect_run),
+                CatTransition(state=CatState.FULL, input_symbol='salami', new_state=CatState.HUNGRY,
+                              side_effect=side_effect_sleep),
+            ]
+        else:
+            self.transitions = transitions
 
-    def __init__(self, initial_state: CatState = CatState.HUNGRY):
-        self._state = initial_state
+        for transition in self.transitions:
+            if transition.state is not None and transition.state not in self.states:
+                raise InvalidCatConfigurationException('Initial transition state is not present in available states')
+            if transition.new_state is not None and transition.new_state not in self.states:
+                raise InvalidCatConfigurationException('New transition state is not present in available states')
 
     def input(self, input_symbol: str):
-        self._state = self.state.handle(input_symbol, self)
-
-    def action_run(self):
-        print('Run!')
-
-    def action_eat(self):
-        print('Eat')
-
-    def action_sleep(self):
-        print('sleep')
+        executed = False
+        for transition in self.transitions:
+            if transition.state == self.state and transition.input == input_symbol:
+                if transition.side_effect is not None:
+                    transition.side_effect()
+                if transition.new_state is not None:
+                    self._state = transition.new_state
+                executed = True
+                break
+        if not executed:
+            raise InvalidInputException
 
 
 if __name__ == '__main__':
