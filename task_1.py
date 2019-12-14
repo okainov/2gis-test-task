@@ -75,6 +75,7 @@ def count_total_stay(file_path: str = 'task_1_input.xml'):
             # Clean up before switching to the next iteration
             time_entry = None
             time_exit = None
+            person = None
 
     return result_data
 
