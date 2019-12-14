@@ -1,6 +1,7 @@
 # 2gis-test-task
 Тестовое задание в 2ГИС на позицию QA инженера
 
+![](https://travis-ci.com/okainov/2gis-test-task.svg?branch=master)
 
 #
 
