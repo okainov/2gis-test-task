@@ -21,13 +21,24 @@ def count_total_stay(file_path: str = 'task_1_input.xml'):
     result_data = defaultdict(datetime.timedelta)
     time_entry = None
     time_exit = None
+    person = None
     one_day = datetime.timedelta(days=1)
-    for event, data in ET.iterparse(file_path):
+    for event, data in ET.iterparse(file_path, events=('start', 'end')):
+        if event == 'start':
+            if data.tag == 'person':
+                if 'full_name' not in data.attrib:
+                    raise Exception('Name of the person is missing for some entries')
+                person = data.attrib['full_name']
+            continue
+
         if data.tag == 'start':
             time_entry = dateutil.parser.parse(data.text)
-        if data.tag == 'end':
+        elif data.tag == 'end':
             time_exit = dateutil.parser.parse(data.text)
-        if data.tag == 'person':
+        elif data.tag == 'person':
+            if time_entry is None or time_exit is None:
+                raise Exception(f'Invalid input: some dates for {person} are missing')
+
             if time_entry.date() == time_exit.date():
                 # Both entry and exit happened in one day
                 result_data[time_entry.date()] += time_exit - time_entry
