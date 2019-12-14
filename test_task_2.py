@@ -17,7 +17,7 @@ class TestCat(TestCase):
     def test_stays_hungry_when_hungry_and_dog(self):
         cat = Cat(Cat.CatState.HUNGRY)
         cat.input('dog')
-        self.assertEqual(cat.state, cat.CatState.HUNGRY)
+        self.assertEqual(cat.state, Cat.CatState.HUNGRY)
 
     def test_eat_when_hungry_and_salami(self):
         cat = Cat(Cat.CatState.HUNGRY)
@@ -28,7 +28,7 @@ class TestCat(TestCase):
     def test_goes_to_full_when_hungry_and_salami(self):
         cat = Cat(Cat.CatState.HUNGRY)
         cat.input('salami')
-        self.assertEqual(cat.state, cat.CatState.FULL)
+        self.assertEqual(cat.state, Cat.CatState.FULL)
 
     def test_sleep_when_full_and_salami(self):
         cat = Cat(Cat.CatState.FULL)
@@ -39,12 +39,12 @@ class TestCat(TestCase):
     def test_goes_to_hungry_when_full_and_salami(self):
         cat = Cat(Cat.CatState.FULL)
         cat.input('salami')
-        self.assertEqual(cat.state, cat.CatState.HUNGRY)
+        self.assertEqual(cat.state, Cat.CatState.HUNGRY)
 
     def test_goes_to_hungry_when_full_and_dog(self):
         cat = Cat(Cat.CatState.FULL)
         cat.input('dog')
-        self.assertEqual(cat.state, cat.CatState.HUNGRY)
+        self.assertEqual(cat.state, Cat.CatState.HUNGRY)
 
     def test_run_when_full_and_dog(self):
         cat = Cat(Cat.CatState.FULL)
