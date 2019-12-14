@@ -42,7 +42,6 @@ def count_total_stay(file_path: str = 'task_1_input.xml'):
 
     # TODO: NOT assuming the data is sorted, so we need to handle all the document
     #  before we can give any response.
-
     result_data = defaultdict(datetime.timedelta)
 
     time_entry = None
@@ -60,6 +59,7 @@ def count_total_stay(file_path: str = 'task_1_input.xml'):
             continue
 
         if data.tag == 'start':
+            # TODO: Input data does not include timezone information, might not be good in the future
             time_entry = dateutil.parser.parse(data.text)
         elif data.tag == 'end':
             time_exit = dateutil.parser.parse(data.text)
