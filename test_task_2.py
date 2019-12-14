@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock
 
-from task_2 import Cat
+from task_2 import Cat, InvalidInputException
 
 
 class TestCat(TestCase):
@@ -51,3 +51,8 @@ class TestCat(TestCase):
         cat.action_run = MagicMock()
         cat.input('dog')
         cat.action_run.assert_called_once()
+
+    def test_invalid_input_exception(self):
+        cat = Cat(Cat.CatState.FULL)
+        with self.assertRaises(InvalidInputException):
+            cat.input('invalid')
