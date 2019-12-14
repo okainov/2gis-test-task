@@ -3,13 +3,21 @@ from typing import List
 
 
 class InvalidInputException(Exception):
+    """
+    Error raised if provided input does not correspond to any of acceptable transition's input
+    """
     pass
 
 
 class InvalidCatConfigurationException(Exception):
+    """
+    Error raised if some of the configuration parameters for Cat are wrong
+    """
     pass
 
 
+# TODO: In order to fulfil OCP, it would be better to define some general CatState type/interface,
+#  so users could create new types on their side and keep the original code closed
 class CatState(Enum):
     HUNGRY = 1
     FULL = 2
@@ -29,6 +37,9 @@ class CatTransition:
         self.side_effect = side_effect
 
 
+# TODO: it's not really known what kind of side effects are here, thus assuming they're just normal functions
+#  without arguments. If needed, it can be extended either to some CatSideEffect interface or just modify arguments
+#  i.e. to include Cat instance itself.
 def side_effect_run():
     """
     Default side effect, called when cat is running
@@ -53,15 +64,27 @@ def side_effect_sleep():
 class Cat:
     @property
     def state(self):
+        """
+        Returns current state of the Cat
+        :return: current state of the Cat
+        """
         return self._state
 
     def __init__(self, states: List[CatState] = None, initial_state: CatState = CatState.HUNGRY,
                  transitions: List[CatTransition] = None):
+        """
+        Creates Cat finite automata from the given list of states and transitions.
+        By default behavior is the same as described in the task description, but it can be customized.
+        :param states: list of possible Cat states
+        :param initial_state: initial state of the Cat
+        :param transitions: list of possible transitions
+        """
 
         if states is None:
             self.states = [CatState.FULL, CatState.HUNGRY]
         else:
             self.states = states
+
         if initial_state is None:
             self._state = CatState.HUNGRY
         else:
@@ -82,6 +105,7 @@ class Cat:
         else:
             self.transitions = transitions
 
+        # Validate states in transitions
         for transition in self.transitions:
             if transition.state is not None and transition.state not in self.states:
                 raise InvalidCatConfigurationException('Initial transition state is not present in available states')
@@ -89,6 +113,10 @@ class Cat:
                 raise InvalidCatConfigurationException('New transition state is not present in available states')
 
     def input(self, input_symbol: str):
+        """
+        Handles input and performs transition according to the current state and input.
+        :param input_symbol: input string
+        """
         executed = False
         for transition in self.transitions:
             if transition.state == self.state and transition.input == input_symbol:
